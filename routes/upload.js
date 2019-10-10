@@ -9,7 +9,7 @@ var media = require('../promises/prmMedia');
 var router = express.Router();
 
 router.get('/',(req,res,next)=>{
-    const uid = '1234';
+    const uid = res.locals.uid;
     const filename = req.query.filename;
 
     

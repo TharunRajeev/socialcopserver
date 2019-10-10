@@ -10,8 +10,18 @@
 
             var app = express();
 
+            
             app.use(express.json());
             app.use(express.urlencoded());
+
+            var cookieParser = require('cookie-parser');
+
+            app.use(cookieParser());
+
+            var authMiddleware = require('./middlewares/authMiddleware');
+
+
+            
 
             var post = require('./routes/post');
 
@@ -19,11 +29,15 @@
 
             var upload = require('./routes/upload');
 
-            app.use('/upload',upload);
+            app.use('/upload',authMiddleware.verifyUser,upload);
             
             var user = require('./routes/user');
 
-            app.use('/user',user);
+            app.use('/user',authMiddleware.verifyUser,user);
+
+            var auth = require('./routes/auth');
+
+            app.use('/auth',auth);
 
             await app.listen(2500);
             

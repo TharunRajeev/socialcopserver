@@ -12,9 +12,9 @@ var media = require('../promises/prmMedia');
 var uniqid = require('uniqid');
 
 router.post('/',(req,res)=>{
-    console.log("hey")
+    
 
-    const uid = '1234';
+    const uid = res.locals.uid;
 
     const image = req.body.image;
     const description = req.body.description;
@@ -60,7 +60,7 @@ router.post('/',(req,res)=>{
 
 
 router.get('/',(req,res)=>{
-    const uid = '1234';
+    const uid = res.locals.uid;
     const pid = req.query.pid;
 
     if(uid && pid){
@@ -71,7 +71,7 @@ router.get('/',(req,res)=>{
 
                     var postUser = await user.getUser({uid:uid});
 
-                    res.send({parentid:currentPost.parentid,pid:currentPost.pid,user:{username:postUser.username,name:postUser.firstname + " " + postUser.lastname,username:postUser.username,profile:postUser.profile},description:currentPost.description,image:(currentPost.image)?await media.getSignedUrl((await media.getMedia(currentPost.image)).url):null,location:currentPost.location,category:currentPost.category,status:currentPost.status,accepted:currentPost.accepted,type:currentPost.type,plusones:await post.getPlusOnes(currentPost.pid),plusoned:await post.isplusOned(currentPost.pid,uid),upvotes:await post.getUpVotes(currentPost.pid),upvoted:await post.isupVoted(currentPost.pid,uid),comments:[],createdAt:currentPost.createdAt});
+                    res.send({parentid:currentPost.parentid,pid:currentPost.pid,user:{username:postUser.username,firstname:postUser.firstname,lastname:postUser.lastname,username:postUser.username,profile:postUser.profile},description:currentPost.description,image:(currentPost.image)?await media.getSignedUrl((await media.getMedia(currentPost.image)).url):null,location:currentPost.location,category:currentPost.category,status:currentPost.status,accepted:currentPost.accepted,type:currentPost.type,plusones:await post.getPlusOnes(currentPost.pid),plusoned:await post.isplusOned(currentPost.pid,uid),upvotes:await post.getUpVotes(currentPost.pid),upvoted:await post.isupVoted(currentPost.pid,uid),comments:[],createdAt:currentPost.createdAt});
 
                 }catch(e){
                     console.log(e);
@@ -86,20 +86,20 @@ router.get('/',(req,res)=>{
 
 
 router.get('/posts',(req,res)=>{
-    const uid='1234';
+    const uid=res.locals.uid||"1234";
 
     const parentid = req.query.parentid;
-    const quid = req.query.quid;
+    const username = req.query.username;
     const type = req.query.type;
     const status = req.query.status;
     const accepted = req.query.accepted;
-    
+
     if(uid){
         (
             async ()=>{
                 try{
                     
-                    const posts = await post.getPosts({parentid:parentid,uid:quid,type:type,status:status,accepted:accepted});
+                    const posts = await post.getPosts({parentid:parentid,uid:(username)?(await user.getUser({username})).uid:null,type:type,status:status,accepted:accepted});
 
                     var processedPosts = [];
 
@@ -108,7 +108,7 @@ router.get('/posts',(req,res)=>{
 
                         const postUser = await user.getUser({uid:uid});
 
-                        processedPosts.push({parentid:currentPost.parentid,pid:currentPost.pid,user:{username:postUser.username,name:postUser.firstname + " " + postUser.lastname,username:postUser.username,profile:postUser.profile},description:currentPost.description,image:(currentPost.image)?await media.getSignedUrl((await media.getMedia(currentPost.image)).url):null,location:currentPost.location,category:currentPost.category,status:currentPost.status,accpepted:currentPost.accepted,type:currentPost.type,plusones:await post.getPlusOnes(currentPost.pid),plusoned:await post.isplusOned(currentPost.pid,uid),upvotes:await post.getUpVotes(currentPost.pid),upvoted:await post.isupVoted(currentPost.pid,uid),comments:[],createdAt:currentPost.createdAt})
+                        processedPosts.push({parentid:currentPost.parentid,pid:currentPost.pid,user:{username:postUser.username,firstname:postUser.firstname,lastname:postUser.lastname,username:postUser.username,profile:postUser.profile},description:currentPost.description,image:(currentPost.image)?await media.getSignedUrl((await media.getMedia(currentPost.image)).url):null,location:currentPost.location,category:currentPost.category,status:currentPost.status,accpepted:currentPost.accepted,type:currentPost.type,plusones:await post.getPlusOnes(currentPost.pid),plusoned:await post.isplusOned(currentPost.pid,uid),upvotes:await post.getUpVotes(currentPost.pid),upvoted:await post.isupVoted(currentPost.pid,uid),comments:[],createdAt:currentPost.createdAt})
 
                     }
                     
@@ -129,7 +129,7 @@ router.get('/posts',(req,res)=>{
 
 
 router.get('/resolve',(req,res)=>{
-    const uid = '1234';
+    const uid = res.locals.uid;
     const parentid = req.query.parentid;
     const pid = req.query.pid;
 
@@ -166,7 +166,7 @@ router.get('/resolve',(req,res)=>{
 
 
 router.get('/upvote',(req,res)=>{
-    const uid = '1234';
+    const uid = res.locals.uid;
 
     const pid = req.query.pid;
 
@@ -195,7 +195,7 @@ router.get('/upvote',(req,res)=>{
 })
 
 router.get('/plusone',(req,res)=>{
-    const uid = '1234';
+    const uid = res.locals.uid;
     const pid = req.query.pid;
 
     if(uid && pid){
@@ -223,7 +223,7 @@ router.get('/plusone',(req,res)=>{
 
 router.delete('/',(req,res)=>{
 
-    const uid = '1234';
+    const uid = res.locals.uid;
     const pid = req.query.pid;
 
     if(pid && uid){
