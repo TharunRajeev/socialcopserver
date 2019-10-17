@@ -7,6 +7,9 @@ var redis = require("../promises/prmRedis");
 module.exports = {
     verifyUser : (req,res,next)=>{
         const token = req.cookies.token;
+        console.log(token);
+
+
 
         if(token){
             (
