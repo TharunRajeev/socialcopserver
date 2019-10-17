@@ -25,7 +25,7 @@
 
             var post = require('./routes/post');
 
-            app.use('/post',post);
+            app.use('/post',authMiddleware.verifyUser,post);
 
             var upload = require('./routes/upload');
 
